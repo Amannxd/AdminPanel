@@ -1,0 +1,147 @@
+07.13 11:27 PM
+Admin111
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EarnerXD Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0e0e0e;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #222;
+      padding: 10px;
+      text-align: center;
+      font-size: 1.4em;
+    }
+    .container {
+      padding: 20px;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 6px;
+    }
+    button {
+      background: #1db954;
+      color: #fff;
+      font-weight: bold;
+    }
+    .section {
+      margin-top: 30px;
+      border-top: 1px solid #333;
+      padding-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>EarnerXD Admin Panel</header>
+  <div class="container">
+    <div id="login">
+      <input type="email" id="email" placeholder="Admin Email">
+      <input type="password" id="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+    </div>
+
+    <div id="adminPanel" style="display:none;">
+      <div class="section">
+        <h3>Add Project</h3>
+        <input id="projTitle" placeholder="Project Title">
+        <input id="projLogo" placeholder="Project Logo URL (optional)">
+        <textarea id="projDesc" placeholder="Description"></textarea>
+        <input id="projAmount" placeholder="Reward ₹">
+        <button onclick="addProject()">Add Project</button>
+      </div>
+
+      <div class="section">
+        <h3>Add Offer</h3>
+        <input id="offerTitle" placeholder="Offer Title">
+        <input id="offerLink" placeholder="Offer Link">
+        <button onclick="addOffer()">Add Offer</button>
+      </div>
+
+      <div class="section">
+        <h3>Add App</h3>
+        <input id="appTitle" placeholder="App Title">
+        <input id="appLink" placeholder="App Link">
+        <button onclick="addApp()">Add App</button>
+      </div>
+
+      <div class="section">
+        <h3>Withdraw Requests</h3>
+        <ul id="withdrawList">Loading...</ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = "https://script.google.com/macros/s/AKfycbzAKdFeTSjLx2kwNQ44-vszLSCelc_u6lcsxB9Bz-2lAhrB2DH0UvYKbZ1wJT0atcxD/exec";
+    const ADMIN_EMAIL = "heml92304@gmail.com";
+    const ADMIN_PASS = "Aman@9289614985";
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+      if (email === ADMIN_EMAIL && pass === ADMIN_PASS) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("adminPanel").style.display = "block";
+        fetchWithdrawals();
+      } else {
+        alert("Incorrect login");
+      }
+    }
+
+    function addProject() {
+      const t = document.getElementById("projTitle").value;
+      const l = document.getElementById("projLogo").value;
+      const d = document.getElementById("projDesc").value;
+      const a = document.getElementById("projAmount").value;
+      fetch(`${API}?action=addProject&title=${encodeURIComponent(t)}&logo=${encodeURIComponent(l)}&desc=${encodeURIComponent(d)}&amount=${encodeURIComponent(a)}`)
+        .then(r => r.text())
+        .then(() => alert("Project Added"));
+    }
+
+    function addOffer() {
+      const t = document.getElementById("offerTitle").value;
+      const l = document.getElementById("offerLink").value;
+      fetch(`${API}?action=addOffer&title=${encodeURIComponent(t)}&link=${encodeURIComponent(l)}`)
+        .then(r => r.text())
+        .then(() => alert("Offer Added"));
+    }
+
+    function addApp() {
+      const t = document.getElementById("appTitle").value;
+      const l = document.getElementById("appLink").value;
+      fetch(`${API}?action=addApp&title=${encodeURIComponent(t)}&link=${encodeURIComponent(l)}`)
+        .then(r => r.text())
+        .then(() => alert("App Added"));
+    }
+
+    function fetchWithdrawals() {
+      fetch(`${API}?action=getWithdrawals`)
+        .then(r => r.json())
+        .then(data => {
+          const list = document.getElementById("withdrawList");
+          list.innerHTML = "";
+          if (data.length === 0) {
+            list.innerHTML = "<li>None yet</li>";
+            return;
+          }
+          data.forEach(w => {
+            const li = document.createElement("li");
+            li.textContent = `${w.email} - ₹${w.amount} - Status: ${w.status}`;
+            list.appendChild(li);
+          });
+        });
+    }
+  </script>
+</body>
+</html>
